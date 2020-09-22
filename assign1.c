@@ -24,22 +24,29 @@ int main(void)
         // printf("User input is : %s", user_input);
         // printf("PATH is : %s", PATH_VAR);
 
-        if(strcmp(user_input, "exit") == 0)         //handling exit command
-        {
-            ExitShell();
-        }
-
-        char *ptr = strtok(user_input, " ");        //parsing arguments
+        char *ptr = strtok(user_input, " \t");        //parsing arguments
         i = 0;
         while(ptr != NULL)
         {
             // printf("'%s'\n", ptr);
             argv[i] = ptr;
-            ptr = strtok(NULL, " ");
+            ptr = strtok(NULL, " \t");
             i++;
         }
         argv[i] = NULL;
-        // printf("argv 2 is :%s", argv[2]);
+        // printf("argv 1 & 2 is :%s,  %s", argv[0], argv[1]);
+
+        if(strcmp(argv[0], "exit") == 0)         //handling exit command
+        {
+            ExitShell();
+        }
+        else if (strcmp(argv[0], "cd") == 0)
+        {
+            if(chdir(argv[1])!=0)  //changing current working directory using chdir
+            {
+            printf("\npath not found: %s\n",argv[1]);
+            }  
+        }
 
         int pid;
         if((pid = fork()) == 0)
