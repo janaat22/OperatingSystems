@@ -15,25 +15,31 @@ int main(void)
     {
         exit(0);
     }
+
+    void parseInput(char *input)
+    {
+        i = 0;
+        while(input != NULL)
+        {
+            // printf("'%s'\n", ptr);
+            argv[i] = input;
+            input = strtok(NULL, " \t");
+            i++;
+        }
+        argv[i] = NULL;
+    }
+
     while(1)
     {
-        
         printf("\nMyShell:");
         char user_input[500];
         gets(user_input);
         // printf("User input is : %s", user_input);
         // printf("PATH is : %s", PATH_VAR);
 
-        char *ptr = strtok(user_input, " \t");        //parsing arguments
-        i = 0;
-        while(ptr != NULL)
-        {
-            // printf("'%s'\n", ptr);
-            argv[i] = ptr;
-            ptr = strtok(NULL, " \t");
-            i++;
-        }
-        argv[i] = NULL;
+        char *input_command = strtok(user_input, " \t");        //parsing arguments
+        parseInput(input_command);
+        
         // printf("argv 1 & 2 is :%s,  %s", argv[0], argv[1]);
 
         if(strcmp(argv[0], "exit") == 0)         //handling exit command
