@@ -1,0 +1,34 @@
+
+X   ls -alg
+X  	ls 		-alg 
+X       ls -l         
+bin/ls -alg
+/    bin/      ls -alg
+/bin/ls -l
+
+
+X cd 
+X cd ..
+X cd OperatingSystems
+X cd /usr
+X cd bin
+X mkdir dir_name
+X rmdir dir_name
+
+
+X   pwd
+
+X   cat test.txt
+X   echo hello
+X   sleep 2
+X   clear
+X   touch testfile.txt
+X   uname
+X   hostname
+
+X   ping
+
+
+X redirect ls -l into wc -wc
+X newpath "newpath variable"
+X exit
