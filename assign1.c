@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <errno.h>
 
 int main(void)
 {
@@ -21,9 +22,9 @@ int main(void)
         exit(0);
     }
 
-    int printError()
+    int printError(char *errormessage)
     {
-        printf("\ncommand error!\n");
+        printf("\ncommand error%s!\n", errormessage);
         //return 0 to simply continue the while loop after displaying error
         return 0;
     }
@@ -39,7 +40,7 @@ int main(void)
         //check if input is NULL
         if(input == NULL)
         {
-           return printError();
+           return printError("");
         }
 
         i = 0;
@@ -52,7 +53,7 @@ int main(void)
                 // if argv has commands stored -> 'redirect' found in the middle of input, so print error message
                 if(i > 0)
                 {
-                    return printError();
+                    return printError(": misplaced redirect");
                 }
                 //prodv index to 0
                 j = 0;
@@ -67,7 +68,7 @@ int main(void)
                         // if prodv array size is 0, i.e, no command after 'redirect' but 'into'
                         if(j == 0)
                             {
-                                return printError();
+                                return printError(": misplaced into");
                             }
                         //consv index to 0
                         k = 0;
@@ -94,7 +95,7 @@ int main(void)
                 //if consv array size is 0
                 if(k == 0)
                 {
-                    return printError();
+                    return printError(": misplaced into");
                 }
                 // set last index of cosnv to NULL
                 prodv[j] = NULL; 
@@ -104,7 +105,7 @@ int main(void)
             //if 'into' found in user input without a 'redirect' 
             else if (strcmp(input, "into") == 0)
             {
-               return printError();              
+               return printError(": missing redirect");              
             }
 
             //if 'newpath' found in user input
@@ -113,7 +114,7 @@ int main(void)
                 // 'newpath' found in the middle of the input
                 if(i > 0)
                 {
-                    return printError();
+                    return printError(": misplaced newpath");
                 }
                 //set argv[0] as 'newpath'
                 argv[0] = input;
@@ -161,7 +162,7 @@ int main(void)
             //error
             if (kidpid == -1) 
             {                 
-                printf("error fork!!\n");
+                printf("fork error!!\n");
                 return 1;
             }             
 
@@ -182,6 +183,7 @@ int main(void)
                     dup2(pd[1], 1);
                     // run command BEFORE pipe character in userinput
                     execvp(prodv[0], prodv); 
+                    perror("Error ");
                     // char *error = strerror(errno);
                     close(pd[1]);
 
@@ -195,8 +197,11 @@ int main(void)
                     dup2(pd[0], 0);
                     // run command AFTER pipe character in userinput
                     execvp(consv[0], consv); 
+                    perror("Error ");
+
                     // char *error = strerror(errno);
                     close(pd[0]);
+                    _exit(1);
                 } // innermost if-else
 
             }
@@ -233,7 +238,11 @@ int main(void)
             //handling 'cd' command
             else if (strcmp(argv[0], "cd") == 0)
             {
-                if(chdir(argv[1])!=0)  //changing current working directory using chdir
+                if(argv[1] == NULL)
+                {
+                    chdir(getenv("HOME"));
+                }
+                else if(chdir(argv[1])!=0)  //changing current working directory using chdir
                 {
                 printf("\npath not found: %s\n",argv[1]);
                 }  
@@ -260,9 +269,9 @@ int main(void)
             if((pid = fork()) == 0)
             {
                 // child process
-                int errno = execvp(argv[0], argv);
-                char *error = strerror(errno);
-                printf("Error: %s", error);
+                execvp(argv[0], argv);
+                //error
+                perror("Error ");
                 _exit(0);
             }
             //wait for the child process to complete
