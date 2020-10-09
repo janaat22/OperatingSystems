@@ -290,3 +290,14 @@ int main(void)
     }
 return 0;
 }
+
+//----------------------------
+// How to execute the program?
+//----------------------------
+// In your bash terminal give the command "gcc assign1.c -o assign1" to compile the program
+// Give the command "./assign1" to run the compiled program
+// To set PATH - newpath "<newpath_value>"
+// To use pipes - redirect ls -l into wc -w
+// To exit type 'exit' and enter
+// Program can't handle IO redirections 
+//----------------------------
