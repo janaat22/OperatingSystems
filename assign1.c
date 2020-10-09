@@ -16,6 +16,7 @@ int main(void)
     int i, j, k = 0; //indices for arrays
     char user_input[500]; // raw input from user
     char user_input_copy[500]; // copy of raw input from user
+
     // Handle Exit command
     int ExitShell()
     {
@@ -24,7 +25,7 @@ int main(void)
 
     int printError(char *errormessage)
     {
-        printf("\ncommand error%s!\n", errormessage);
+        printf("\nInvalid command%s!\n", errormessage);
         //return 0 to simply continue the while loop after displaying error
         return 0;
     }
@@ -32,10 +33,10 @@ int main(void)
     //parse user input
     //input: user input
     //output: argv, prodv and conv arrays 
-    //return: 0 - continue while loop, 1,2 - special commands like cd, exit, newpath, redirect
+    //return: 0 - continue while loop, 1 - commands, 2 - pipe commands
     int parseInput(char *input)
     {
-        //array indices
+        //array indices argv, prodv and consv respectively
         i, j, k = 0; 
         //check if input is NULL
         if(input == NULL)
@@ -124,7 +125,7 @@ int main(void)
                 argv[1] = strtok(NULL, "\"");
                 return 1;
             
-            }
+             }
 
             //if no special command detected, append command in argv array
             argv[i] = input;
@@ -167,10 +168,8 @@ int main(void)
             }             
 
             if (kidpid == 0) 
-            {
-
+            {            
                 // shell child creates the pipe
-
                 pipe(pd);
 
                 // shell child creates grandchild
@@ -181,13 +180,13 @@ int main(void)
                     close(pd[0]);
                     // dup into stdout
                     dup2(pd[1], 1);
-                    // run command BEFORE pipe character in userinput
+                    // run command BEFORE into in userinput
+                    //producer side of pipe
                     execvp(prodv[0], prodv); 
                     perror("Error ");
-                    // char *error = strerror(errno);
                     close(pd[1]);
 
-                    _exit(1); // execvp() failed
+                    _exit(1); 
 
                 } 
                 else 
@@ -195,14 +194,14 @@ int main(void)
                     close(pd[1]);
                     // dup into stdin
                     dup2(pd[0], 0);
-                    // run command AFTER pipe character in userinput
+                    // run command AFTER into in userinput
+                    //consumer side of pipe
                     execvp(consv[0], consv); 
                     perror("Error ");
-
-                    // char *error = strerror(errno);
                     close(pd[0]);
+
                     _exit(1);
-                } // innermost if-else
+                } 
 
             }
 
@@ -222,12 +221,14 @@ int main(void)
         char *input_command = strtok(user_input, " \t");   
         // call parseInput to populate argv, prodv, consv arrays   
         int parsed_output = parseInput(input_command);
+
         // if return value is 0, continue..
         if(parsed_output == 0)
         {
             continue;
         }
-        // of return value = 1 
+
+        // if return value = 1 
         else if(parsed_output == 1)
         {            
             //handling 'exit' command
@@ -238,6 +239,7 @@ int main(void)
             //handling 'cd' command
             else if (strcmp(argv[0], "cd") == 0)
             {
+                // printf("\nPATH is set to: %s\n", getenv("PATH"));
                 if(argv[1] == NULL)
                 {
                     chdir(getenv("HOME"));
@@ -246,6 +248,7 @@ int main(void)
                 {
                 printf("\npath not found: %s\n",argv[1]);
                 }  
+                //continue while loop
                 continue;
             }
             //handling 'newpath' command
@@ -259,13 +262,15 @@ int main(void)
                     printf("ERROR: new path not set!");
                 }
                 // print newly set path
-                printf("\nPATH is set to: %s\n", getenv("PATH"));
+                // printf("\nPATH is set to: %s\n", getenv("PATH"));
+                //continue while loop
                 continue;                
             }
 
             //execute rest of the commands
             int pid;
-             
+            // printf("Args are %s  %s %s", argv[0], argv[1], argv[2]);
+
             if((pid = fork()) == 0)
             {
                 // child process

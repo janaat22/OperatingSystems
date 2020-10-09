@@ -2,9 +2,7 @@ Commands:
 X   ls -alg
 X  	ls 		-alg 
 X       ls -l         
-bin/ls -alg
-/    bin/      ls -alg
-/bin/ls -l
+X   /bin/ls -alg
 X cd 
 X cd ..
 X cd OperatingSystems
@@ -24,10 +22,15 @@ X   hostname
 X   ping
 X newpath "newpath variable"
 X exit
+X   grep from jan.txt
+X   freg from jan.txt
+X   grep from jan1.txt jan.txt
 
 Errors:
 X   Unknown command Errors
 X   Command error for missing into, trailing into, missing redirect, into soon after redirect
 
 Pipes:
-redirect ls -l into wc -wc -> exists the while loop  
+X   redirect ls -l into wc -wc 
+X   redirect cat test.txt into wc -l
+X   redirect cat jan.txt into grep jan
